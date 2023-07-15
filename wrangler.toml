@@ -1,2 +1,6 @@
-name = "my-app"
+name = "fixbluesky"
+main = "src/index.ts"
 compatibility_date = "2023-01-01"
+
+workers_dev = false
+route = { pattern = "bsyy.app/*", zone_name = "bsyy.app" }
