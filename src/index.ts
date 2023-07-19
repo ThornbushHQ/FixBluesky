@@ -1,8 +1,10 @@
 import { Hono } from "hono";
 import { BskyAgent } from "@atproto/api";
-import { getPost } from "./lib/getPost";
-import { getPostData } from "./lib/getPostData";
-import { getPostOEmbed } from "./lib/getPostOEmbed";
+import { getPost } from "./routes/getPost";
+import { getPostData } from "./routes/getPostData";
+import { getOEmbed } from "./routes/getOEmbed";
+import { getProfileData } from "./routes/getProfileData";
+import { getProfile } from "./routes/getProfile";
 
 const app = new Hono<Env>();
 
@@ -26,6 +28,12 @@ app.get("/https://bsky.app/profile/:user/post/:post", getPost);
 app.get("/profile/:user/post/:post/json", getPostData);
 app.get("/https://bsky.app/profile/:user/post/:post/json", getPostData);
 
-app.get("/oembed", getPostOEmbed);
+app.get("/profile/:user", getProfile);
+app.get("/https://bsky.app/profile/:user", getProfile);
+
+app.get("/profile/:user/json", getProfileData);
+app.get("/https://bsky.app/profile/:user/json", getProfileData);
+
+app.get("/oembed", getOEmbed);
 
 export default app;

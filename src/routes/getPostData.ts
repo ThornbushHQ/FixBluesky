@@ -1,4 +1,6 @@
 import { Handler } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { fetchPost } from "../lib/fetchPostData";
 
 export const getPostData: Handler<
   Env,
@@ -7,11 +9,11 @@ export const getPostData: Handler<
 > = async (c) => {
   const { user, post } = c.req.param();
   const agent = c.get("Agent");
-  const { data: userData } = await agent.getProfile({
-    actor: user,
-  });
-  const { data } = await agent.getPosts({
-    uris: [`at://${userData.did}/app.bsky.feed.post/${post}`],
-  });
+  const { data, success } = await fetchPost(agent, { user, post });
+  if (!success) {
+    throw new HTTPException(500, {
+      message: "Failed to fetch the post!",
+    });
+  }
   return c.json(data);
 };
