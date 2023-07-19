@@ -20,11 +20,8 @@ export const Layout = ({ url, children }: LayoutProps) => {
         <meta property="og:site_name" content="FixBluesky" />
 
         ${children}
+        <meta http-equiv="refresh" content="0;url=${redirectUrl}" />
       </head>
     </html>
   `;
 };
-
-{
-  /* <meta http-equiv="refresh" content="0;url=${redirectUrl}" /> */
-}
