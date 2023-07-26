@@ -18,7 +18,7 @@ export const getProfile: Handler<
   return c.html(
     <Profile
       profile={data}
-      url={c.req.url}
+      url={c.req.path}
       appDomain={c.env.FIXBLUESKY_APP_DOMAIN}
     />
   );
