@@ -5,16 +5,26 @@ import { getPostData } from "./routes/getPostData";
 import { getOEmbed } from "./routes/getOEmbed";
 import { getProfileData } from "./routes/getProfileData";
 import { getProfile } from "./routes/getProfile";
+import { HTTPException } from "hono/http-exception";
 
 const app = new Hono<Env>();
 
 app.use("*", async (c, next) => {
   const agent = new BskyAgent({ service: c.env.BSKY_SERVICE_URL });
-  await agent.login({
-    identifier: c.env.BSKY_AUTH_USERNAME,
-    password: c.env.BSKY_AUTH_PASSWORD,
-  });
-  c.set("Agent", agent);
+  try {
+    await agent.login({
+      identifier: c.env.BSKY_AUTH_USERNAME,
+      password: c.env.BSKY_AUTH_PASSWORD,
+    });
+    c.set("Agent", agent);
+  } catch (error) {
+    const err = new Error("Failed to login to Bluesky!", {
+      cause: error,
+    });
+    throw new HTTPException(500, {
+      message: `${err.message} \n\n ${err.cause} \n\n ${err.stack}`,
+    });
+  }
   return next();
 });
 
