@@ -9,13 +9,37 @@ import { HTTPException } from "hono/http-exception";
 
 const app = new Hono<Env>();
 
+app.get("/", async (c) => {
+  return c.redirect("https://github.com/ThornbushHQ/FixBluesky");
+});
+
 app.use("*", async (c, next) => {
-  const agent = new BskyAgent({ service: c.env.BSKY_SERVICE_URL });
+  console.log("hi");
+  const agent = new BskyAgent({
+    service: c.env.BSKY_SERVICE_URL,
+    persistSession: async (_evt, session) => {
+      if (session) {
+        await c.env.KV.put("session", JSON.stringify(session));
+      }
+    },
+  });
   try {
-    await agent.login({
-      identifier: c.env.BSKY_AUTH_USERNAME,
-      password: c.env.BSKY_AUTH_PASSWORD,
-    });
+    const rawSession = await c.env.KV.get("session");
+    if (rawSession) {
+      const session = JSON.parse(rawSession);
+      const login = await agent.resumeSession(session);
+      if (!login.success) {
+        await agent.login({
+          identifier: c.env.BSKY_AUTH_USERNAME,
+          password: c.env.BSKY_AUTH_PASSWORD,
+        });
+      }
+    } else {
+      await agent.login({
+        identifier: c.env.BSKY_AUTH_USERNAME,
+        password: c.env.BSKY_AUTH_PASSWORD,
+      });
+    }
     c.set("Agent", agent);
   } catch (error) {
     const err = new Error("Failed to login to Bluesky!", {
@@ -26,10 +50,6 @@ app.use("*", async (c, next) => {
     });
   }
   return next();
-});
-
-app.get("/", async (c) => {
-  return c.redirect("https://github.com/ThornbushHQ/FixBluesky");
 });
 
 app.get("/profile/:user/post/:post", getPost);

@@ -5,6 +5,10 @@ compatibility_date = "2023-01-01"
 workers_dev = false
 route = { pattern = "bsyy.app/*", zone_name = "bsyy.app" }
 
+kv_namespaces = [
+  { binding = "KV", id = "1f72b982d5004ace92ae002d9f858ca3", preview_id = "09f1c7455b1a4e2eb258a3fd9239bab1" }
+]
+
 [vars]
 BSKY_SERVICE_URL="https://bsky.social/"
 FIXBLUESKY_APP_DOMAIN="bsyy.app"
